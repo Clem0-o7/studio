@@ -3,14 +3,44 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import type { Document } from '@/lib/types';
+import type { Document, DocumentStatus } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { User, FileType } from 'lucide-react';
+import { User, FileType, CheckCircle2, XCircle, Hourglass } from 'lucide-react';
 import { withAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { mockDocuments } from '@/lib/mock-data';
+import { Badge } from '@/components/ui/badge';
+
+const StatusBadge = ({ status }: { status: DocumentStatus }) => {
+  switch (status) {
+    case 'Approved':
+      return (
+        <Badge className="bg-accent hover:bg-accent/80 text-accent-foreground gap-2 border-transparent">
+          <CheckCircle2 className="h-4 w-4" />
+          Approved
+        </Badge>
+      );
+    case 'Rejected':
+      return (
+        <Badge variant="destructive" className="gap-2">
+          <XCircle className="h-4 w-4" />
+          Rejected
+        </Badge>
+      );
+    case 'Pending':
+      return (
+        <Badge variant="secondary" className="gap-2">
+          <Hourglass className="h-4 w-4" />
+          Pending
+        </Badge>
+      );
+    default:
+      return <Badge variant="outline">{status}</Badge>;
+  }
+};
+
 
 function AdminDashboardPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -25,13 +55,11 @@ function AdminDashboardPage() {
     }, 500);
   }, []);
 
-  const pendingDocuments = documents.filter(d => d.status === 'Pending');
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Admin Dashboard</CardTitle>
-        <CardDescription>Review and approve pending document submissions.</CardDescription>
+        <CardDescription>Review and manage all document submissions.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="border rounded-md">
@@ -41,18 +69,19 @@ function AdminDashboardPage() {
                 <TableHead>Document Name</TableHead>
                 <TableHead>User</TableHead>
                 <TableHead>Upload Date</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                  <TableRow>
-                    <TableCell colSpan={4}>
+                    <TableCell colSpan={5}>
                         <Skeleton className="h-8 w-full" />
                     </TableCell>
                 </TableRow>
-              ) : pendingDocuments.length > 0 ? (
-                pendingDocuments.map((doc: Document) => (
+              ) : documents.length > 0 ? (
+                documents.map((doc: Document) => (
                   <TableRow key={doc.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
@@ -67,6 +96,9 @@ function AdminDashboardPage() {
                       </div>
                     </TableCell>
                     <TableCell>{new Date(doc.uploadDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={doc.status} />
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button asChild size="sm">
                         <Link href={`/admin/review/${doc.id}`}>Review</Link>
@@ -76,8 +108,8 @@ function AdminDashboardPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
-                    No pending documents to review.
+                  <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                    No documents have been submitted yet.
                   </TableCell>
                 </TableRow>
               )}
