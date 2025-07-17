@@ -2,15 +2,37 @@
 'use client';
 
 import Link from 'next/link';
-import { documents } from '@/lib/mock-data';
+import { useEffect, useState } from 'react';
+import { collection, getDocs, query } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { Document } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { User, Calendar, FileType } from 'lucide-react';
 import { withAuth } from '@/hooks/use-auth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function AdminDashboardPage() {
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const q = query(collection(db, 'documents'));
+        const querySnapshot = await getDocs(q);
+        const docsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Document));
+        setDocuments(docsData);
+      } catch (error) {
+        console.error("Error fetching documents: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDocuments();
+  }, []);
+
   const pendingDocuments = documents.filter(d => d.status === 'Pending');
 
   return (
@@ -21,48 +43,54 @@ function AdminDashboardPage() {
       </CardHeader>
       <CardContent>
         <div className="border rounded-md">
-            <Table>
+          <Table>
             <TableHeader>
-                <TableRow>
+              <TableRow>
                 <TableHead>Document Name</TableHead>
                 <TableHead>User</TableHead>
                 <TableHead>Upload Date</TableHead>
                 <TableHead className="text-right">Action</TableHead>
-                </TableRow>
+              </TableRow>
             </TableHeader>
             <TableBody>
-                {pendingDocuments.length > 0 ? (
-                pendingDocuments.map((doc: Document) => (
-                    <TableRow key={doc.id}>
-                    <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                            <FileType className="h-4 w-4 text-muted-foreground" />
-                            {doc.name}
-                        </div>
-                    </TableCell>
-                    <TableCell>
-                        <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-muted-foreground" />
-                            {doc.user}
-                        </div>
-                    </TableCell>
-                    <TableCell>{doc.uploadDate}</TableCell>
-                    <TableCell className="text-right">
-                        <Button asChild size="sm">
-                        <Link href={`/admin/review/${doc.id}`}>Review</Link>
-                        </Button>
-                    </TableCell>
-                    </TableRow>
-                ))
-                ) : (
-                <TableRow>
-                    <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
-                    No pending documents to review.
+              {loading ? (
+                 <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center">
+                        <Skeleton className="h-8 w-full" />
                     </TableCell>
                 </TableRow>
-                )}
+              ) : pendingDocuments.length > 0 ? (
+                pendingDocuments.map((doc: Document) => (
+                  <TableRow key={doc.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <FileType className="h-4 w-4 text-muted-foreground" />
+                        {doc.name}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        {doc.userEmail}
+                      </div>
+                    </TableCell>
+                    <TableCell>{new Date(doc.uploadDate).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild size="sm">
+                        <Link href={`/admin/review/${doc.id}`}>Review</Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
+                    No pending documents to review.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
-            </Table>
+          </Table>
         </div>
       </CardContent>
     </Card>

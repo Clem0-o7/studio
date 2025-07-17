@@ -1,11 +1,13 @@
+
 export type DocumentStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export type Document = {
   id: string;
   name: string;
-  user: string;
-  uploadDate: string;
+  userId: string;
+  userEmail: string;
+  uploadDate: any; // Firestore timestamp
   status: DocumentStatus;
-  type: 'PDF' | 'Image' | 'Word';
-  url: string;
+  suggestion?: string;
+  url?: string; // This is now optional as we link to a folder
 };
