@@ -88,15 +88,7 @@ export default function LoginPage() {
               <LogIn className="mr-2 h-4 w-4" /> Login
             </Button>
           </form>
-           <div className="my-4 flex items-center">
-            <div className="flex-grow border-t border-muted" />
-            <span className="mx-4 flex-shrink text-xs uppercase text-muted-foreground">Or continue with</span>
-            <div className="flex-grow border-t border-muted" />
-          </div>
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-            <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 381.4 512 244 512 109.8 512 0 402.2 0 256S109.8 0 244 0c73 0 135.3 29.7 181.4 78.6l-65.2 65.2c-22.6-21.5-54.2-34.5-87.2-34.5-67.3 0-121.5 54.4-121.5 121.5s54.2 121.5 121.5 121.5c77.9 0 102.8-58.5 106.3-87.3H244v-83.3h235.2c4.7 25.4 7.8 53.3 7.8 83.3z"></path></svg>
-            Google
-          </Button>
+           
         </CardContent>
       </Card>
     </div>
