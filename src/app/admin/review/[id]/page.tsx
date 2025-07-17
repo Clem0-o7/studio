@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -6,13 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, User, Calendar, FileType, ArrowLeft } from 'lucide-react';
+import { Check, MessageSquare, X, User, Calendar, FileType, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import React, { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export default function DocumentReviewPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { toast } = useToast();
+  const [suggestion, setSuggestion] = useState('');
   const document = documents.find(d => d.id === params.id);
 
   if (!document) {
@@ -40,12 +45,36 @@ export default function DocumentReviewPage({ params }: { params: { id: string } 
     router.push('/admin');
   };
 
-  const handleReject = () => {
-    // In a real app, update the document status in the database
+  const handleApproveWithSuggestion = () => {
+    if (!suggestion.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Suggestion Required",
+        description: "Please provide a suggestion before approving.",
+      });
+      return;
+    }
+    toast({
+      title: "Document Approved with Suggestions",
+      description: `"${document.name}" has been approved. Suggestion: ${suggestion}`,
+      className: "bg-accent text-accent-foreground border-accent",
+    });
+    router.push('/admin');
+  };
+
+  const handleRejectWithSuggestion = () => {
+    if (!suggestion.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Suggestion Required",
+        description: "Please provide a reason for rejection.",
+      });
+      return;
+    }
     toast({
       variant: "destructive",
-      title: "Document Rejected",
-      description: `"${document.name}" has been marked as rejected.`,
+      title: "Document Rejected with Suggestion",
+      description: `"${document.name}" has been rejected. Reason: ${suggestion}`,
     });
     router.push('/admin');
   };
@@ -91,14 +120,26 @@ export default function DocumentReviewPage({ params }: { params: { id: string } 
                 <FileType className="h-4 w-4 text-muted-foreground mt-0.5" />
                 <span>File Type: <strong className="font-semibold">{document.type}</strong></span>
             </div>
+            <Separator className="my-2" />
+            <div className="space-y-2">
+                <Label htmlFor="suggestion">Suggestions / Rejection Reason</Label>
+                <Textarea 
+                    id="suggestion" 
+                    placeholder="Provide feedback here..." 
+                    value={suggestion}
+                    onChange={(e) => setSuggestion(e.target.value)}
+                />
+            </div>
           </CardContent>
-          <Separator className="my-4" />
-          <CardFooter className="flex flex-col gap-2">
+          <CardFooter className="flex flex-col gap-2 pt-0">
             <Button onClick={handleApprove} className="w-full bg-accent hover:bg-accent/80 text-accent-foreground">
               <Check className="mr-2 h-4 w-4" /> Approve
             </Button>
-            <Button onClick={handleReject} variant="destructive" className="w-full">
-              <X className="mr-2 h-4 w-4" /> Reject
+             <Button onClick={handleApproveWithSuggestion} className="w-full" variant="secondary">
+              <MessageSquare className="mr-2 h-4 w-4" /> Approve with Suggestions
+            </Button>
+            <Button onClick={handleRejectWithSuggestion} variant="destructive" className="w-full">
+              <X className="mr-2 h-4 w-4" /> Reject with Suggestion
             </Button>
             <Button variant="outline" className="w-full mt-2" asChild>
                 <Link href="/admin"><ArrowLeft className="mr-2 h-4 w-4" /> Back to List</Link>
