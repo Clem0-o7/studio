@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Check, MessageSquare, X, User, Calendar, FileType, ArrowLeft, Download, ExternalLink } from 'lucide-react';
+import { Check, X, User, Calendar, ArrowLeft, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +20,7 @@ export function DocumentReviewClient({ document }: { document: Document }) {
   const { toast } = useToast();
   const [suggestion, setSuggestion] = useState(document.suggestion || '');
   const [loading, setLoading] = useState(false);
+  const driveFolderUrl = "https://drive.google.com/drive/u/5/folders/18tppk1V3BX5aliGjhLwuRHUPNdt-GSaT";
 
   const updateDocumentStatus = (status: 'Approved' | 'Rejected') => {
     setLoading(true);
@@ -43,6 +44,18 @@ export function DocumentReviewClient({ document }: { document: Document }) {
   const handleApprove = () => {
     updateDocumentStatus('Approved');
   };
+  
+  const handleApproveWithSuggestion = () => {
+     if (!suggestion.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Suggestion Required",
+        description: "Please provide a suggestion before approving.",
+      });
+      return;
+    }
+    updateDocumentStatus('Approved');
+  }
 
   const handleRejectWithSuggestion = () => {
     if (!suggestion.trim()) {
@@ -63,23 +76,21 @@ export function DocumentReviewClient({ document }: { document: Document }) {
           <CardHeader>
             <CardTitle>Review Document</CardTitle>
             <CardDescription>
-              Review the document details and take action. The file itself would be downloaded from its source.
+              Open the Google Drive folder to find and review the submitted document.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Alert>
-              <Download className="h-4 w-4" />
-              <AlertTitle>Simulated Document Preview</AlertTitle>
+              <ExternalLink className="h-4 w-4" />
+              <AlertTitle>Document Review Workflow</AlertTitle>
               <AlertDescription>
-                In a real application, you would see a preview of the document here or have a secure link to download it.
-                <br />
-                File Name: <strong>{document.name}</strong>
+                The submitted file is named <strong>{document.name}</strong>. Please find it in the shared Google Drive folder to review its contents.
               </AlertDescription>
             </Alert>
 
-             <Button asChild className="mt-4 w-full" disabled>
-              <a href={document.url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" /> Download Document (Disabled in Mock)
+             <Button asChild className="mt-4 w-full">
+              <a href={driveFolderUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" /> Open Google Drive Folder
               </a>
             </Button>
           </CardContent>
@@ -113,8 +124,11 @@ export function DocumentReviewClient({ document }: { document: Document }) {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-2 pt-0">
-            <Button onClick={handleApprove} className="w-full bg-accent hover:bg-accent/80 text-accent-foreground" disabled={loading}>
+            <Button onClick={handleApprove} className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={loading}>
               <Check className="mr-2 h-4 w-4" /> {loading ? "Processing..." : "Approve"}
+            </Button>
+            <Button onClick={handleApproveWithSuggestion} className="w-full" disabled={loading}>
+              <Check className="mr-2 h-4 w-4" /> {loading ? "Processing..." : "Approve with Suggestion"}
             </Button>
             <Button onClick={handleRejectWithSuggestion} variant="destructive" className="w-full" disabled={loading}>
               <X className="mr-2 h-4 w-4" /> {loading ? "Processing..." : "Reject with Suggestion"}
