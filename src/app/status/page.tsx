@@ -22,11 +22,11 @@ const StatusBadge = ({ status }: { status: DocumentStatus }) => {
           Approved
         </Badge>
       );
-    case 'Rejected':
+    case 'Declined':
       return (
         <Badge variant="destructive" className="gap-2">
           <XCircle className="h-4 w-4" />
-          Rejected
+          Declined
         </Badge>
       );
     case 'Pending':
@@ -83,7 +83,7 @@ function StatusPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[40%]">Document Name</TableHead>
-                <TableHead>Upload Date</TableHead>
+                <TableHead>Upload Date & Time</TableHead>
                 <TableHead>Suggestion</TableHead>
                 <TableHead className="text-right">Status</TableHead>
               </TableRow>
@@ -104,8 +104,15 @@ function StatusPage() {
                         <span className="truncate">{doc.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{new Date(doc.uploadDate).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-muted-foreground text-xs">{doc.suggestion || 'N/A'}</TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>{new Date(doc.uploadDate).toLocaleDateString()}</div>
+                        <div className="text-muted-foreground text-xs">
+                          {new Date(doc.uploadDate).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs">{doc.suggestion || '-'}</TableCell>
                     <TableCell className="text-right">
                       <StatusBadge status={doc.status} />
                     </TableCell>

@@ -14,20 +14,24 @@ import { Label } from '@/components/ui/label';
 import type { Document } from '@/lib/types';
 import { updateDocumentInFirestore } from '@/lib/firebaseService';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 export function DocumentReviewClient({ document }: { document: Document }) {
   const router = useRouter();
   const { toast } = useToast();
   const [suggestion, setSuggestion] = useState(document.suggestion || '');
   const [loading, setLoading] = useState(false);
+  const [dialogSuggestion, setDialogSuggestion] = useState('');
+  const [approveWithSuggestionOpen, setApproveWithSuggestionOpen] = useState(false);
+  const [declineWithSuggestionOpen, setDeclineWithSuggestionOpen] = useState(false);
   const driveFolderUrl = "https://drive.google.com/drive/u/5/folders/18tppk1V3BX5aliGjhLwuRHUPNdt-GSaT";
 
-  const updateDocumentStatus = async (status: 'Approved' | 'Rejected') => {
+  const updateDocumentStatus = async (status: 'Approved' | 'Declined', suggestionText?: string) => {
     setLoading(true);
     try {
       await updateDocumentInFirestore(document.id, {
         status,
-        suggestion: suggestion || undefined,
+        suggestion: suggestionText || undefined,
       });
       
       toast({
@@ -48,11 +52,15 @@ export function DocumentReviewClient({ document }: { document: Document }) {
   };
 
   const handleApprove = () => {
-    updateDocumentStatus('Approved');
+    updateDocumentStatus('Approved', 'N/A');
+  };
+
+  const handleDecline = () => {
+    updateDocumentStatus('Declined', 'N/A');
   };
   
   const handleApproveWithSuggestion = () => {
-     if (!suggestion.trim()) {
+    if (!dialogSuggestion.trim()) {
       toast({
         variant: "destructive",
         title: "Suggestion Required",
@@ -60,19 +68,23 @@ export function DocumentReviewClient({ document }: { document: Document }) {
       });
       return;
     }
-    updateDocumentStatus('Approved');
-  }
+    updateDocumentStatus('Approved', dialogSuggestion);
+    setApproveWithSuggestionOpen(false);
+    setDialogSuggestion('');
+  };
 
-  const handleRejectWithSuggestion = () => {
-    if (!suggestion.trim()) {
+  const handleDeclineWithSuggestion = () => {
+    if (!dialogSuggestion.trim()) {
       toast({
         variant: "destructive",
-        title: "Suggestion Required",
-        description: "Please provide a reason for rejection.",
+        title: "Reason Required",
+        description: "Please provide a reason for declining.",
       });
       return;
     }
-    updateDocumentStatus('Rejected');
+    updateDocumentStatus('Declined', dialogSuggestion);
+    setDeclineWithSuggestionOpen(false);
+    setDialogSuggestion('');
   };
 
   return (
@@ -128,30 +140,106 @@ export function DocumentReviewClient({ document }: { document: Document }) {
             </div>
             <div className="flex items-start gap-3 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <span>Uploaded on: <strong className="font-semibold">{new Date(document.uploadDate).toLocaleDateString()}</strong></span>
+                <div>
+                  <div>Uploaded on: <strong className="font-semibold">{new Date(document.uploadDate).toLocaleDateString()}</strong></div>
+                  <div className="text-muted-foreground text-xs">
+                    Time: {new Date(document.uploadDate).toLocaleTimeString()}
+                  </div>
+                </div>
             </div>
             <Separator className="my-2" />
-            <div className="space-y-2">
-                <Label htmlFor="suggestion">Suggestions / Rejection Reason</Label>
-                <Textarea 
-                    id="suggestion" 
-                    placeholder="Provide feedback here..." 
-                    value={suggestion}
-                    onChange={(e) => setSuggestion(e.target.value)}
-                    disabled={loading}
-                />
-            </div>
+            {document.suggestion && (
+              <div className="space-y-2">
+                <Label>Current Suggestion</Label>
+                <div className="text-sm text-muted-foreground p-2 bg-muted rounded">
+                  {document.suggestion}
+                </div>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col gap-2 pt-0">
             <Button onClick={handleApprove} className="w-full bg-green-600 hover:bg-green-700 text-white" disabled={loading}>
               <Check className="mr-2 h-4 w-4" /> {loading ? "Processing..." : "Approve"}
             </Button>
-            <Button onClick={handleApproveWithSuggestion} className="w-full" disabled={loading}>
-              <Check className="mr-2 h-4 w-4" /> {loading ? "Processing..." : "Approve with Suggestion"}
+            
+            <Dialog open={approveWithSuggestionOpen} onOpenChange={setApproveWithSuggestionOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full bg-green-500 hover:bg-green-600 text-white" disabled={loading}>
+                  <Check className="mr-2 h-4 w-4" /> Approve with Suggestions
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Approve with Suggestions</DialogTitle>
+                  <DialogDescription>
+                    Provide suggestions for the approved document.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <Label htmlFor="approve-suggestion">Suggestions</Label>
+                  <Textarea 
+                    id="approve-suggestion"
+                    placeholder="Enter your suggestions here..."
+                    value={dialogSuggestion}
+                    onChange={(e) => setDialogSuggestion(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => {
+                    setApproveWithSuggestionOpen(false);
+                    setDialogSuggestion('');
+                  }}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleApproveWithSuggestion} className="bg-green-600 hover:bg-green-700 text-white">
+                    <Check className="mr-2 h-4 w-4" /> Approve
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Button onClick={handleDecline} variant="destructive" className="w-full" disabled={loading}>
+              <X className="mr-2 h-4 w-4" /> {loading ? "Processing..." : "Decline"}
             </Button>
-            <Button onClick={handleRejectWithSuggestion} variant="destructive" className="w-full" disabled={loading}>
-              <X className="mr-2 h-4 w-4" /> {loading ? "Processing..." : "Reject with Suggestion"}
-            </Button>
+
+            <Dialog open={declineWithSuggestionOpen} onOpenChange={setDeclineWithSuggestionOpen}>
+              <DialogTrigger asChild>
+                <Button variant="destructive" className="w-full bg-red-600 hover:bg-red-700" disabled={loading}>
+                  <X className="mr-2 h-4 w-4" /> Decline with Suggestions
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Decline with Suggestions</DialogTitle>
+                  <DialogDescription>
+                    Provide reasons for declining this document.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2">
+                  <Label htmlFor="decline-suggestion">Reasons / Suggestions</Label>
+                  <Textarea 
+                    id="decline-suggestion"
+                    placeholder="Enter your reasons or suggestions here..."
+                    value={dialogSuggestion}
+                    onChange={(e) => setDialogSuggestion(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => {
+                    setDeclineWithSuggestionOpen(false);
+                    setDialogSuggestion('');
+                  }}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleDeclineWithSuggestion} variant="destructive">
+                    <X className="mr-2 h-4 w-4" /> Decline
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
             <Button variant="outline" className="w-full mt-2" asChild>
                 <Link href="/admin"><ArrowLeft className="mr-2 h-4 w-4" /> Back to List</Link>
             </Button>

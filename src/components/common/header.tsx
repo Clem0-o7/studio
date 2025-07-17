@@ -15,41 +15,50 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between p-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
           <FileText className="h-6 w-6" />
-          <span className="font-headline">ThiagarajarDocs</span>
+          <span className="font-headline">Thiagarajar Approval Automation System</span>
         </Link>
         <nav className="hidden md:flex items-center gap-2">
-          <Button variant="ghost" asChild>
-            <Link href="/">Home</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link href="/upload">Upload</Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <Link href="/status">Status</Link>
-          </Button>
-          <Separator orientation="vertical" className="h-6 mx-2" />
-          {user ? (
+          {user && isAdmin ? (
+            // Admin navigation - only Admin and Logout
             <>
-              {isAdmin && (
-                <Button variant="ghost" asChild>
-                  <Link href="/admin">
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin
-                  </Link>
-                </Button>
-              )}
+              <Button variant="ghost" asChild>
+                <Link href="/admin">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Admin
+                </Link>
+              </Button>
               <Button variant="outline" onClick={logout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
             </>
           ) : (
-            <Button variant="outline" asChild>
-              <Link href="/login">
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
-              </Link>
-            </Button>
+            // Regular user navigation
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/">Home</Link>
+              </Button>
+              <Button variant="ghost" asChild>
+                <Link href="/upload">Upload</Link>
+              </Button>
+              <Button variant="ghost" asChild>
+                <Link href="/status">Status</Link>
+              </Button>
+              <Separator orientation="vertical" className="h-6 mx-2" />
+              {user ? (
+                <Button variant="outline" onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              ) : (
+                <Button variant="outline" asChild>
+                  <Link href="/login">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Login
+                  </Link>
+                </Button>
+              )}
+            </>
           )}
         </nav>
       </div>

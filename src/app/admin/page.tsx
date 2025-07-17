@@ -24,11 +24,11 @@ const StatusBadge = ({ status }: { status: DocumentStatus }) => {
           Approved
         </Badge>
       );
-    case 'Rejected':
+    case 'Declined':
       return (
         <Badge variant="destructive" className="gap-2">
           <XCircle className="h-4 w-4" />
-          Rejected
+          Declined
         </Badge>
       );
     case 'Pending':
@@ -87,15 +87,16 @@ function AdminDashboardPage() {
               <TableRow>
                 <TableHead>Document Name</TableHead>
                 <TableHead>User</TableHead>
-                <TableHead>Upload Date</TableHead>
+                <TableHead>Upload Date & Time</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Suggestions</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                  <TableRow>
-                    <TableCell colSpan={5}>
+                    <TableCell colSpan={6}>
                         <Skeleton className="h-8 w-full" />
                     </TableCell>
                 </TableRow>
@@ -114,9 +115,21 @@ function AdminDashboardPage() {
                         {doc.userEmail}
                       </div>
                     </TableCell>
-                    <TableCell>{new Date(doc.uploadDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div>{new Date(doc.uploadDate).toLocaleDateString()}</div>
+                        <div className="text-muted-foreground text-xs">
+                          {new Date(doc.uploadDate).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={doc.status} />
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs max-w-[200px]">
+                      <div className="truncate" title={doc.suggestion || '-'}>
+                        {doc.suggestion || '-'}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild size="sm">
@@ -127,7 +140,7 @@ function AdminDashboardPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
                     No documents have been submitted yet.
                   </TableCell>
                 </TableRow>

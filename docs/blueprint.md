@@ -1,4 +1,4 @@
-# **App Name**: ThiagarajarDocs
+# **App Name**: Thiagarajar Approval Automation System
 
 ## Core Features:
 

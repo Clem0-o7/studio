@@ -36,7 +36,7 @@ export const mockDocuments: Document[] = [
     userId: 'user123',
     userEmail: 'student@example.com',
     uploadDate: new Date('2023-10-20').toISOString(),
-    status: 'Rejected',
+    status: 'Declined',
     suggestion: 'Please include a bibliography and resubmit.',
     url: '#',
   },

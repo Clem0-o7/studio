@@ -1,5 +1,5 @@
 
-export type DocumentStatus = 'Pending' | 'Approved' | 'Rejected';
+export type DocumentStatus = 'Pending' | 'Approved' | 'Declined';
 
 export type Document = {
   id: string;
