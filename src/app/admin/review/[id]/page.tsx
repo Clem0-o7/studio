@@ -2,8 +2,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -11,6 +9,7 @@ import { DocumentReviewClient } from './DocumentReviewClient';
 import { withAuth } from '@/hooks/use-auth';
 import type { Document } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { mockDocuments } from '@/lib/mock-data';
 
 
 function DocumentReviewPage({ params }: { params: { id: string } }) {
@@ -21,25 +20,18 @@ function DocumentReviewPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     if (!params.id) return;
 
-    const fetchDocument = async () => {
-      try {
-        const docRef = doc(db, "documents", params.id);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setDocument({ id: docSnap.id, ...docSnap.data() } as Document);
+    setLoading(true);
+    // Simulate fetching data
+    setTimeout(() => {
+        const doc = mockDocuments.find(d => d.id === params.id);
+        if (doc) {
+            setDocument(doc);
         } else {
-          setError("Document not found.");
+            setError("Document not found.");
         }
-      } catch (err) {
-        console.error("Error fetching document:", err);
-        setError("Failed to load document.");
-      } finally {
         setLoading(false);
-      }
-    };
+    }, 500);
 
-    fetchDocument();
   }, [params.id]);
 
 
@@ -48,7 +40,7 @@ function DocumentReviewPage({ params }: { params: { id: string } }) {
         <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
                 <Skeleton className="h-16 w-1/2" />
-                <Skeleton className="h-[70vh] w-full" />
+                <Skeleton className="h-[40vh] w-full" />
             </div>
             <div className="lg:col-span-1 space-y-4">
                 <Skeleton className="h-48 w-full" />

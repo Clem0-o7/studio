@@ -6,8 +6,8 @@ export type Document = {
   name: string;
   userId: string;
   userEmail: string;
-  uploadDate: any; // Firestore timestamp
+  uploadDate: string; // ISO 8601 date string
   status: DocumentStatus;
   suggestion?: string;
-  url?: string; // This is now optional as we link to a folder
+  url: string; 
 };

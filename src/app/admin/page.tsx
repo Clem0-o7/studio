@@ -3,34 +3,26 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import type { Document } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { User, Calendar, FileType } from 'lucide-react';
+import { User, FileType } from 'lucide-react';
 import { withAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { mockDocuments } from '@/lib/mock-data';
 
 function AdminDashboardPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        const q = query(collection(db, 'documents'));
-        const querySnapshot = await getDocs(q);
-        const docsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Document));
-        setDocuments(docsData);
-      } catch (error) {
-        console.error("Error fetching documents: ", error);
-      } finally {
+    // Simulate fetching all documents for admin
+    setLoading(true);
+    setTimeout(() => {
+        setDocuments(mockDocuments);
         setLoading(false);
-      }
-    };
-    fetchDocuments();
+    }, 500);
   }, []);
 
   const pendingDocuments = documents.filter(d => d.status === 'Pending');
@@ -55,7 +47,7 @@ function AdminDashboardPage() {
             <TableBody>
               {loading ? (
                  <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center">
+                    <TableCell colSpan={4}>
                         <Skeleton className="h-8 w-full" />
                     </TableCell>
                 </TableRow>
