@@ -26,7 +26,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast({ title: 'Login Successful' });
-      router.push('/');
+      router.push('/admin');
     } catch (err: any) {
       setError(err.message);
       toast({
@@ -42,7 +42,7 @@ export default function LoginPage() {
     try {
       await signInWithPopup(auth, provider);
       toast({ title: 'Login Successful' });
-      router.push('/');
+      router.push('/admin');
     } catch (err: any) {
         setError(err.message);
         toast({

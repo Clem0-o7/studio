@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 
 export function Header() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, logout, username } = useAuth();
 
   return (
     <header className="bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-40 border-b">
@@ -21,6 +21,7 @@ export function Header() {
           {user && isAdmin ? (
             // Admin navigation - only Admin and Logout
             <>
+              <span className="text-sm text-muted-foreground mr-4">Welcome, {username}</span>
               <Button variant="ghost" asChild>
                 <Link href="/admin">
                   <Shield className="mr-2 h-4 w-4" />
@@ -46,10 +47,13 @@ export function Header() {
               </Button>
               <Separator orientation="vertical" className="h-6 mx-2" />
               {user ? (
-                <Button variant="outline" onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </Button>
+                <>
+                  <span className="text-sm text-muted-foreground mr-4">Welcome, {username}</span>
+                  <Button variant="outline" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+                </>
               ) : (
                 <Button variant="outline" asChild>
                   <Link href="/login">

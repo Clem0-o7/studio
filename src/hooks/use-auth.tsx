@@ -9,11 +9,26 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const ADMIN_EMAIL = "admin@gmail.com";
 
+// Username mapping for emails
+const EMAIL_TO_USERNAME: { [key: string]: string } = {
+  "admin@gmail.com": "Admin",
+  "tce@gmail.com": "TCE",
+  "tca@gmail.com": "TCARTS",
+  "tmill@gmail.com": "TMILLS"
+};
+
+// Helper function to get username from email
+export const getUsernameFromEmail = (email: string | null | undefined): string => {
+  if (!email) return "Unknown";
+  return EMAIL_TO_USERNAME[email] || "Unknown";
+};
+
 interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   loading: boolean;
   logout: () => void;
+  username: string;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +36,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   loading: true,
   logout: () => {},
+  username: "Unknown",
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -44,9 +60,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const isAdmin = user?.email === ADMIN_EMAIL;
+  const username = getUsernameFromEmail(user?.email);
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, logout }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, logout, username }}>
       {children}
     </AuthContext.Provider>
   );

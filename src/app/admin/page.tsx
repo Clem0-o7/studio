@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { User, FileType, CheckCircle2, XCircle, Hourglass } from 'lucide-react';
-import { withAuth } from '@/hooks/use-auth';
+import { withAuth, getUsernameFromEmail } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAllDocumentsFromFirestore } from '@/lib/firebaseService';
 import { Badge } from '@/components/ui/badge';
@@ -112,7 +112,7 @@ function AdminDashboardPage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-muted-foreground" />
-                        {doc.userEmail}
+                        {getUsernameFromEmail(doc.userEmail)}
                       </div>
                     </TableCell>
                     <TableCell>

@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { withAuth, useAuth } from "@/hooks/use-auth";
+import { withAuth, useAuth, getUsernameFromEmail } from "@/hooks/use-auth";
 import { uploadPdfToSupabase } from "@/lib/supabasePdfUpload";
 import { addDocumentToFirestore } from "@/lib/firebaseService";
 
