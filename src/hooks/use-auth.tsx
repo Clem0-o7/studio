@@ -7,7 +7,7 @@ import { app } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+const ADMIN_EMAIL = "admin@gmail.com";
 
 interface AuthContextType {
   user: User | null;
