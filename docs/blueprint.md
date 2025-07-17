@@ -1,4 +1,4 @@
-# **App Name**: Thiagarajar Approval Automation System
+# **App Name**: TAAS
 
 ## Core Features:
 

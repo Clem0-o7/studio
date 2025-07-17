@@ -14,8 +14,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>Thiagarajar Approval Automation System</title>
-        <meta name="description" content="Secure and efficient document submission and approval." />
+        <title>TAAS</title>
+        <meta name="description" content="Thiagarajar Approval Automation System" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet"></link>

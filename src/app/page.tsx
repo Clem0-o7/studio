@@ -9,10 +9,10 @@ export default function Home() {
       <Card className="w-full max-w-3xl">
         <CardHeader>
           <CardTitle className="text-4xl lg:text-5xl font-headline tracking-tight">
-            Welcome to Thiagarajar Approval Automation System
+            Welcome to TAAS
           </CardTitle>
-          <CardDescription className="text-lg text-muted-foreground pt-2">
-            Your secure and efficient solution for document submission and approval.
+          <CardDescription className="text-lg text-foreground pt-4">
+            Thiagarajar Approval Automation System
           </CardDescription>
         </CardHeader>
         <CardContent>
