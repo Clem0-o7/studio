@@ -10,7 +10,7 @@ import { Check, X, User, Calendar, ArrowLeft, ExternalLink } from 'lucide-react'
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
-import {getUsernameFromEmail } from '@/hooks/use-auth';
+import {getUsernameFromEmail, useAuth } from '@/hooks/use-auth';
 import { Label } from '@/components/ui/label';
 import type { Document } from '@/lib/types';
 import { updateDocumentInFirestore } from '@/lib/firebaseService';
@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 export function DocumentReviewClient({ document }: { document: Document }) {
   const router = useRouter();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [suggestion, setSuggestion] = useState(document.suggestion || '');
   const [loading, setLoading] = useState(false);
   const [dialogSuggestion, setDialogSuggestion] = useState('');
@@ -33,7 +34,7 @@ export function DocumentReviewClient({ document }: { document: Document }) {
       await updateDocumentInFirestore(document.id, {
         status,
         suggestion: suggestionText || undefined,
-      });
+      }, user?.email || undefined);
       
       toast({
         title: `Document ${status}`,
@@ -148,6 +149,20 @@ export function DocumentReviewClient({ document }: { document: Document }) {
                   </div>
                 </div>
             </div>
+            {document.adminDecisionDate && document.status !== 'Pending' && (
+              <div className="flex items-start gap-3 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <div>
+                  <div>Decision made on: <strong className="font-semibold">{new Date(document.adminDecisionDate).toLocaleDateString()}</strong></div>
+                  <div className="text-muted-foreground text-xs">
+                    Time: {new Date(document.adminDecisionDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {document.adminDecisionBy && (
+                      <span> by {getUsernameFromEmail(document.adminDecisionBy)}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             <Separator className="my-2" />
             {document.suggestion && (
               <div className="space-y-2">

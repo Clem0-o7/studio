@@ -119,15 +119,24 @@ export async function getDocumentFromFirestore(documentId) {
  * Updates a document in Firebase Firestore
  * @param {string} documentId - Document ID
  * @param {Object} updateData - Data to update
+ * @param {string} adminEmail - Email of admin making the decision (optional)
  * @returns {Promise<void>}
  */
-export async function updateDocumentInFirestore(documentId, updateData) {
+export async function updateDocumentInFirestore(documentId, updateData, adminEmail = null) {
   try {
     const docRef = doc(db, DOCUMENTS_COLLECTION, documentId);
-    await updateDoc(docRef, {
+    const updatePayload = {
       ...updateData,
       updatedAt: new Date()
-    });
+    };
+    
+    // If status is being updated and adminEmail is provided, track admin decision
+    if (updateData.status && adminEmail && updateData.status !== 'Pending') {
+      updatePayload.adminDecisionDate = new Date().toISOString();
+      updatePayload.adminDecisionBy = adminEmail;
+    }
+    
+    await updateDoc(docRef, updatePayload);
   } catch (error) {
     console.error('Error updating document in Firestore:', error);
     throw new Error(`Failed to update document: ${error.message}`);
