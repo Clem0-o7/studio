@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { FileText, CheckCircle2, XCircle, Hourglass } from 'lucide-react';
 import { withAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
-import { mockDocuments } from '@/lib/mock-data';
+import { getUserDocumentsFromFirestore } from '@/lib/firebaseService';
+import { useToast } from '@/hooks/use-toast';
 
 const StatusBadge = ({ status }: { status: DocumentStatus }) => {
   switch (status) {
@@ -43,20 +44,32 @@ const StatusBadge = ({ status }: { status: DocumentStatus }) => {
 
 function StatusPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
 
-    setLoading(true);
-    // Simulate fetching documents for the current user from mock data
-    setTimeout(() => {
-        const userDocuments = mockDocuments.filter(doc => doc.userId === user.uid);
+    const fetchDocuments = async () => {
+      setLoading(true);
+      try {
+        const userDocuments = await getUserDocumentsFromFirestore(user.uid);
         setDocuments(userDocuments);
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load your documents. Please try again.",
+        });
+      } finally {
         setLoading(false);
-    }, 500);
-  }, [user]);
+      }
+    };
+
+    fetchDocuments();
+  }, [user, toast]);
 
   return (
     <Card>

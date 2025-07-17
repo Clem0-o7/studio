@@ -10,4 +10,8 @@ export type Document = {
   status: DocumentStatus;
   suggestion?: string;
   url: string; 
+  fileSize?: number;
+  fileType?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

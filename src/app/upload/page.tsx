@@ -13,12 +13,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { withAuth, useAuth } from "@/hooks/use-auth";
-import { mockDocuments } from "@/lib/mock-data";
+import { uploadPdfToSupabase } from "@/lib/supabasePdfUpload";
+import { addDocumentToFirestore } from "@/lib/firebaseService";
 
 const formSchema = z.object({
   documentFile: z
-    .instanceof(FileList)
-    .refine((files) => files?.length === 1, "A document file is required."),
+    .any()
+    .refine((files) => files?.length === 1, "A document file is required.")
+    .refine((files) => files?.[0]?.type === "application/pdf", "Only PDF files are allowed.")
+    .refine((files) => files?.[0]?.size <= 10 * 1024 * 1024, "File size must be less than 10MB."),
 });
 
 function UploadPage() {
@@ -43,29 +46,44 @@ function UploadPage() {
 
     setLoading(true);
 
-    const fileName = values.documentFile[0].name;
+    try {
+      const file = values.documentFile[0];
+      const fileName = file.name;
 
-    // Simulate API call to upload file
-    setTimeout(() => {
-        // Add to mock data
-        mockDocuments.unshift({
-            id: `doc_${Date.now()}`,
-            name: fileName,
-            userId: user.uid,
-            userEmail: user.email || 'unknown@example.com',
-            uploadDate: new Date().toISOString(),
-            status: 'Pending',
-            url: '#', // Mock URL
-        });
+      // Upload PDF to Supabase Storage
+      const fileUrl = await uploadPdfToSupabase(file, user.uid, fileName);
 
-        toast({
-            title: "Upload Successful!",
-            description: `Your document "${fileName}" has been submitted for review.`,
-        });
+      // Save document metadata to Firebase Firestore
+      const documentData = {
+        name: fileName,
+        userId: user.uid,
+        userEmail: user.email || 'unknown@example.com',
+        uploadDate: new Date().toISOString(),
+        status: 'Pending',
+        url: fileUrl,
+        fileSize: file.size,
+        fileType: file.type
+      };
 
-        form.reset();
-        setLoading(false);
-    }, 1500);
+      const documentId = await addDocumentToFirestore(documentData);
+
+      toast({
+        title: "Upload Successful!",
+        description: `Your document "${fileName}" has been submitted for review.`,
+      });
+
+      form.reset();
+    } catch (error) {
+      console.error('Upload error:', error);
+      const errorMessage = error instanceof Error ? error.message : "An error occurred while uploading your document.";
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: errorMessage,
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -74,7 +92,7 @@ function UploadPage() {
         <CardHeader>
           <CardTitle>Upload Document</CardTitle>
           <CardDescription>
-            Select a document from your computer to submit for approval.
+            Select a PDF document from your computer to submit for approval. Maximum file size: 10MB.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -85,10 +103,11 @@ function UploadPage() {
                 name="documentFile"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Document File</FormLabel>
+                    <FormLabel>Document File (PDF only)</FormLabel>
                     <FormControl>
                       <Input
                         type="file"
+                        accept=".pdf,application/pdf"
                         {...fileRef}
                         disabled={loading}
                       />

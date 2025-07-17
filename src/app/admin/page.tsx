@@ -10,8 +10,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { User, FileType, CheckCircle2, XCircle, Hourglass } from 'lucide-react';
 import { withAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
-import { mockDocuments } from '@/lib/mock-data';
+import { getAllDocumentsFromFirestore } from '@/lib/firebaseService';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { debugDocuments } from '@/lib/debugUtils';
 
 const StatusBadge = ({ status }: { status: DocumentStatus }) => {
   switch (status) {
@@ -43,17 +45,34 @@ const StatusBadge = ({ status }: { status: DocumentStatus }) => {
 
 
 function AdminDashboardPage() {
+  const { toast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching all documents for admin
-    setLoading(true);
-    setTimeout(() => {
-        setDocuments(mockDocuments);
+    const fetchDocuments = async () => {
+      setLoading(true);
+      try {
+        const allDocuments = await getAllDocumentsFromFirestore();
+        setDocuments(allDocuments);
+        
+        // Debug: Log document structure
+        console.log('=== ADMIN DEBUG ===');
+        await debugDocuments();
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load documents. Please try again.",
+        });
+      } finally {
         setLoading(false);
-    }, 500);
-  }, []);
+      }
+    };
+
+    fetchDocuments();
+  }, [toast]);
 
   return (
     <Card>

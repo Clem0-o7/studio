@@ -12,7 +12,7 @@ import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import type { Document } from '@/lib/types';
-import { mockDocuments } from '@/lib/mock-data';
+import { updateDocumentInFirestore } from '@/lib/firebaseService';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export function DocumentReviewClient({ document }: { document: Document }) {
@@ -22,23 +22,29 @@ export function DocumentReviewClient({ document }: { document: Document }) {
   const [loading, setLoading] = useState(false);
   const driveFolderUrl = "https://drive.google.com/drive/u/5/folders/18tppk1V3BX5aliGjhLwuRHUPNdt-GSaT";
 
-  const updateDocumentStatus = (status: 'Approved' | 'Rejected') => {
+  const updateDocumentStatus = async (status: 'Approved' | 'Rejected') => {
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const docIndex = mockDocuments.findIndex(d => d.id === document.id);
-      if (docIndex !== -1) {
-        mockDocuments[docIndex].status = status;
-        mockDocuments[docIndex].suggestion = suggestion || undefined;
-      }
+    try {
+      await updateDocumentInFirestore(document.id, {
+        status,
+        suggestion: suggestion || undefined,
+      });
       
       toast({
         title: `Document ${status}`,
         description: `"${document.name}" has been marked as ${status.toLowerCase()}.`,
       });
       router.push('/admin');
+    } catch (error) {
+      console.error('Error updating document:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update document status. Please try again.",
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleApprove = () => {
@@ -76,23 +82,36 @@ export function DocumentReviewClient({ document }: { document: Document }) {
           <CardHeader>
             <CardTitle>Review Document</CardTitle>
             <CardDescription>
-              Open the Google Drive folder to find and review the submitted document.
+              Review the submitted PDF document below.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Alert>
-              <ExternalLink className="h-4 w-4" />
-              <AlertTitle>Document Review Workflow</AlertTitle>
-              <AlertDescription>
-                The submitted file is named <strong>{document.name}</strong>. Please find it in the shared Google Drive folder to review its contents.
-              </AlertDescription>
-            </Alert>
-
-             <Button asChild className="mt-4 w-full">
-              <a href={driveFolderUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" /> Open Google Drive Folder
-              </a>
-            </Button>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">{document.name}</h3>
+                <Button asChild variant="outline" size="sm">
+                  <a href={document.url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="mr-2 h-4 w-4" /> Open PDF
+                  </a>
+                </Button>
+              </div>
+              
+              <div className="border rounded-lg overflow-hidden">
+                <iframe
+                  src={document.url}
+                  className="w-full h-[600px]"
+                  title="PDF Document"
+                />
+              </div>
+              
+              <Alert>
+                <ExternalLink className="h-4 w-4" />
+                <AlertTitle>Document Details</AlertTitle>
+                <AlertDescription>
+                  If the PDF doesn't display properly, use the "Open PDF" button above to view it in a new tab.
+                </AlertDescription>
+              </Alert>
+            </div>
           </CardContent>
         </Card>
       </div>

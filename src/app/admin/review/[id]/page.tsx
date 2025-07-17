@@ -9,10 +9,12 @@ import { DocumentReviewClient } from './DocumentReviewClient';
 import { withAuth } from '@/hooks/use-auth';
 import type { Document } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { mockDocuments } from '@/lib/mock-data';
+import { getDocumentFromFirestore } from '@/lib/firebaseService';
+import { useToast } from '@/hooks/use-toast';
 
 
 function DocumentReviewPage({ params }: { params: { id: string } }) {
+  const { toast } = useToast();
   const [document, setDocument] = useState<Document | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,18 +26,30 @@ function DocumentReviewPage({ params }: { params: { id: string } }) {
       return;
     }
 
-    setLoading(true);
-    // Simulate fetching data by finding the document in the mock array
-    const doc = mockDocuments.find(d => d.id === params.id);
+    const fetchDocument = async () => {
+      setLoading(true);
+      try {
+        const doc = await getDocumentFromFirestore(params.id);
+        if (doc) {
+          setDocument(doc as Document);
+        } else {
+          setError("Document not found.");
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+        setError("Failed to load document. Please try again.");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load document. Please try again.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (doc) {
-      setDocument(doc);
-    } else {
-      setError("Document not found.");
-    }
-    setLoading(false);
-
-  }, [params.id]);
+    fetchDocument();
+  }, [params.id, toast]);
 
 
   if (loading) {
