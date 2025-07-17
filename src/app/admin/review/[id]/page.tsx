@@ -1,12 +1,15 @@
 
+'use client';
+
 import { documents } from '@/lib/mock-data';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { DocumentReviewClient } from './DocumentReviewClient';
+import { withAuth } from '@/hooks/use-auth';
 
 
-export default function DocumentReviewPage({ params }: { params: { id: string } }) {
+function DocumentReviewPage({ params }: { params: { id: string } }) {
   const document = documents.find(d => d.id === params.id);
 
   if (!document) {
@@ -26,3 +29,5 @@ export default function DocumentReviewPage({ params }: { params: { id: string } 
 
   return <DocumentReviewClient document={document} />;
 }
+
+export default withAuth(DocumentReviewPage, { adminOnly: true });

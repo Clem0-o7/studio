@@ -1,3 +1,6 @@
+
+'use client';
+
 import Link from 'next/link';
 import { documents } from '@/lib/mock-data';
 import type { Document } from '@/lib/types';
@@ -5,8 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { User, Calendar, FileType } from 'lucide-react';
+import { withAuth } from '@/hooks/use-auth';
 
-export default function AdminDashboardPage() {
+function AdminDashboardPage() {
   const pendingDocuments = documents.filter(d => d.status === 'Pending');
 
   return (
@@ -64,3 +68,5 @@ export default function AdminDashboardPage() {
     </Card>
   );
 }
+
+export default withAuth(AdminDashboardPage, { adminOnly: true });

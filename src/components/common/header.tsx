@@ -1,9 +1,15 @@
+
+'use client';
+
 import Link from 'next/link';
-import { FileText, Shield } from 'lucide-react';
+import { FileText, Shield, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/hooks/use-auth';
 
 export function Header() {
+  const { user, isAdmin, logout } = useAuth();
+
   return (
     <header className="bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-40 border-b">
       <div className="container mx-auto flex h-16 items-center justify-between p-4">
@@ -22,12 +28,29 @@ export function Header() {
             <Link href="/status">Status</Link>
           </Button>
           <Separator orientation="vertical" className="h-6 mx-2" />
-          <Button variant="outline" asChild>
-            <Link href="/admin">
-              <Shield className="mr-2 h-4 w-4" />
-              Admin Panel
-            </Link>
-          </Button>
+          {user ? (
+            <>
+              {isAdmin && (
+                <Button variant="ghost" asChild>
+                  <Link href="/admin">
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin
+                  </Link>
+                </Button>
+              )}
+              <Button variant="outline" onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <Button variant="outline" asChild>
+              <Link href="/login">
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </Link>
+            </Button>
+          )}
         </nav>
       </div>
     </header>

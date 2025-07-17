@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,12 +12,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { withAuth } from "@/hooks/use-auth";
 
 const formSchema = z.object({
   document: z.any().refine((files) => files?.length > 0, "A document is required."),
 });
 
-export default function UploadPage() {
+function UploadPage() {
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -64,7 +66,7 @@ export default function UploadPage() {
                         />
                     </FormControl>
                     <FormDescription>
-                        This file will be securely stored in Google Drive.
+                        This file will be securely stored and reviewed.
                     </FormDescription>
                     <FormMessage />
                     </FormItem>
@@ -80,3 +82,5 @@ export default function UploadPage() {
     </div>
   );
 }
+
+export default withAuth(UploadPage);
