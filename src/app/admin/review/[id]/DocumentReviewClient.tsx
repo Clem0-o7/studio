@@ -10,6 +10,7 @@ import { Check, X, User, Calendar, ArrowLeft, ExternalLink } from 'lucide-react'
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
+import {getUsernameFromEmail } from '@/hooks/use-auth';
 import { Label } from '@/components/ui/label';
 import type { Document } from '@/lib/types';
 import { updateDocumentInFirestore } from '@/lib/firebaseService';
@@ -136,7 +137,7 @@ export function DocumentReviewClient({ document }: { document: Document }) {
           <CardContent className="space-y-4">
             <div className="flex items-start gap-3 text-sm">
                 <User className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <span>Submitted by: <strong className="font-semibold">{document.userEmail}</strong></span>
+                <span>Submitted by: <strong className="font-semibold">{getUsernameFromEmail(document.userEmail)}</strong></span>
             </div>
             <div className="flex items-start gap-3 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
