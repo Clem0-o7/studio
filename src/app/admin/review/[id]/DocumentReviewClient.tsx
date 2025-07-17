@@ -144,7 +144,7 @@ export function DocumentReviewClient({ document }: { document: Document }) {
                 <div>
                   <div>Uploaded on: <strong className="font-semibold">{new Date(document.uploadDate).toLocaleDateString()}</strong></div>
                   <div className="text-muted-foreground text-xs">
-                    Time: {new Date(document.uploadDate).toLocaleTimeString()}
+                    Time: {new Date(document.uploadDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
             </div>

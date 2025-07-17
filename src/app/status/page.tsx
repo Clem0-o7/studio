@@ -108,7 +108,7 @@ function StatusPage() {
                       <div className="text-sm">
                         <div>{new Date(doc.uploadDate).toLocaleDateString()}</div>
                         <div className="text-muted-foreground text-xs">
-                          {new Date(doc.uploadDate).toLocaleTimeString()}
+                          {new Date(doc.uploadDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     </TableCell>
