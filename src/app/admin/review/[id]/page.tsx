@@ -18,19 +18,22 @@ function DocumentReviewPage({ params }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!params.id) return;
+    if (!params.id) {
+      setLoading(false);
+      setError("No document ID provided.");
+      return;
+    }
 
     setLoading(true);
-    // Simulate fetching data
-    setTimeout(() => {
-        const doc = mockDocuments.find(d => d.id === params.id);
-        if (doc) {
-            setDocument(doc);
-        } else {
-            setError("Document not found.");
-        }
-        setLoading(false);
-    }, 500);
+    // Simulate fetching data by finding the document in the mock array
+    const doc = mockDocuments.find(d => d.id === params.id);
+
+    if (doc) {
+      setDocument(doc);
+    } else {
+      setError("Document not found.");
+    }
+    setLoading(false);
 
   }, [params.id]);
 
@@ -54,7 +57,7 @@ function DocumentReviewPage({ params }: { params: { id: string } }) {
     return (
       <div className="text-center py-10">
         <h2 className="text-2xl font-bold">{error || 'Document Not Found'}</h2>
-        <p className="text-muted-foreground">The document you are looking for does not exist.</p>
+        <p className="text-muted-foreground">The document you are looking for does not exist or could not be loaded.</p>
         <Button asChild className="mt-4">
           <Link href="/admin">
             <ArrowLeft className="mr-2 h-4 w-4" />
