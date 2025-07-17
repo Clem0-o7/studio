@@ -15,7 +15,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between p-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-primary">
           <FileText className="h-6 w-6" />
-          <span className="font-headline">DocuApprove</span>
+          <span className="font-headline">ThiagarajarDocs</span>
         </Link>
         <nav className="hidden md:flex items-center gap-2">
           <Button variant="ghost" asChild>

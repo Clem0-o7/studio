@@ -1,4 +1,4 @@
-# **App Name**: DocuApprove
+# **App Name**: ThiagarajarDocs
 
 ## Core Features:
 
