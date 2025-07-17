@@ -1,0 +1,136 @@
+
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { Check, MessageSquare, X, User, Calendar, FileType, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import React, { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import type { Document } from '@/lib/types';
+
+export function DocumentReviewClient({ document }: { document: Document }) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [suggestion, setSuggestion] = useState('');
+
+  const handleApprove = () => {
+    // In a real app, update the document status in the database
+    toast({
+      title: "Document Approved",
+      description: `"${document.name}" has been marked as approved.`,
+      className: "bg-accent text-accent-foreground border-accent",
+    });
+    router.push('/admin');
+  };
+
+  const handleApproveWithSuggestion = () => {
+    if (!suggestion.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Suggestion Required",
+        description: "Please provide a suggestion before approving.",
+      });
+      return;
+    }
+    toast({
+      title: "Document Approved with Suggestions",
+      description: `"${document.name}" has been approved. Suggestion: ${suggestion}`,
+      className: "bg-accent text-accent-foreground border-accent",
+    });
+    router.push('/admin');
+  };
+
+  const handleRejectWithSuggestion = () => {
+    if (!suggestion.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Suggestion Required",
+        description: "Please provide a reason for rejection.",
+      });
+      return;
+    }
+    toast({
+      variant: "destructive",
+      title: "Document Rejected with Suggestion",
+      description: `"${document.name}" has been rejected. Reason: ${suggestion}`,
+    });
+    router.push('/admin');
+  };
+
+  return (
+    <div className="grid lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-2">
+        <Card className="h-full">
+          <CardHeader>
+            <CardTitle>Document Viewer</CardTitle>
+            <CardDescription>Review the contents of the document below.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full h-[70vh] bg-muted rounded-md flex items-center justify-center overflow-hidden border">
+              <Image 
+                src={document.url} 
+                alt={`Preview of ${document.name}`}
+                width={850}
+                height={1100}
+                className="object-contain w-full h-full"
+                data-ai-hint="document contract"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="lg:col-span-1">
+        <Card className="sticky top-20">
+          <CardHeader>
+            <CardTitle className="truncate">{document.name}</CardTitle>
+            <CardDescription>Details and actions for this document.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-start gap-3 text-sm">
+                <User className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <span>Submitted by: <strong className="font-semibold">{document.user}</strong></span>
+            </div>
+            <div className="flex items-start gap-3 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <span>Uploaded on: <strong className="font-semibold">{document.uploadDate}</strong></span>
+            </div>
+            <div className="flex items-start gap-3 text-sm">
+                <FileType className="h-4 w-4 text-muted-foreground mt-0.5" />
+                <span>File Type: <strong className="font-semibold">{document.type}</strong></span>
+            </div>
+            <Separator className="my-2" />
+            <div className="space-y-2">
+                <Label htmlFor="suggestion">Suggestions / Rejection Reason</Label>
+                <Textarea 
+                    id="suggestion" 
+                    placeholder="Provide feedback here..." 
+                    value={suggestion}
+                    onChange={(e) => setSuggestion(e.target.value)}
+                />
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-2 pt-0">
+            <Button onClick={handleApprove} className="w-full bg-accent hover:bg-accent/80 text-accent-foreground">
+              <Check className="mr-2 h-4 w-4" /> Approve
+            </Button>
+             <Button onClick={handleApproveWithSuggestion} className="w-full" variant="secondary">
+              <MessageSquare className="mr-2 h-4 w-4" /> Approve with Suggestions
+            </Button>
+            <Button onClick={handleRejectWithSuggestion} variant="destructive" className="w-full">
+              <X className="mr-2 h-4 w-4" /> Reject with Suggestion
+            </Button>
+            <Button variant="outline" className="w-full mt-2" asChild>
+                <Link href="/admin"><ArrowLeft className="mr-2 h-4 w-4" /> Back to List</Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
+}
