@@ -95,10 +95,11 @@ function AdminDashboardPage() {
       filtered = filtered.filter(doc => doc.status === statusFilter);
     }
 
-    // Filter by search query (document name)
+    // Filter by search query (document name and reason)
     if (searchQuery.trim()) {
       filtered = filtered.filter(doc => 
-        doc.name.toLowerCase().includes(searchQuery.toLowerCase())
+        doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (doc.reason && doc.reason.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -189,6 +190,7 @@ function AdminDashboardPage() {
               <TableRow>
                 <TableHead>Document Name</TableHead>
                 <TableHead>User</TableHead>
+                <TableHead>Reason for Upload</TableHead>
                 <TableHead>Upload Date-Time</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Admin Action Time</TableHead>
@@ -199,7 +201,7 @@ function AdminDashboardPage() {
             <TableBody>
               {loading ? (
                  <TableRow>
-                    <TableCell colSpan={7}>
+                    <TableCell colSpan={8}>
                         <Skeleton className="h-8 w-full" />
                     </TableCell>
                 </TableRow>
@@ -216,6 +218,11 @@ function AdminDashboardPage() {
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-muted-foreground" />
                         {getUsernameFromEmail(doc.userEmail)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm max-w-[250px]">
+                      <div className="truncate" title={doc.reason || 'No reason provided'}>
+                        {doc.reason || <span className="text-muted-foreground italic">No reason provided</span>}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -258,7 +265,7 @@ function AdminDashboardPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
                     {documents.length === 0 
                       ? "No documents have been submitted yet."
                       : "No documents match the current filters."

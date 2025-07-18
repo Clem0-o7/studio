@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, User, Calendar, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Check, X, User, Calendar, ArrowLeft, ExternalLink, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
@@ -149,6 +149,17 @@ export function DocumentReviewClient({ document }: { document: Document }) {
                   </div>
                 </div>
             </div>
+            {document.reason && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  <Label className="text-sm font-medium">Reason for Upload</Label>
+                </div>
+                <div className="text-sm p-3 bg-muted rounded-md border">
+                  {document.reason}
+                </div>
+              </div>
+            )}
             {document.adminDecisionDate && document.status !== 'Pending' && (
               <div className="flex items-start gap-3 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground mt-0.5" />

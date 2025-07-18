@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { withAuth, useAuth, getUsernameFromEmail } from "@/hooks/use-auth";
 import { uploadPdfToSupabase } from "@/lib/supabasePdfUpload";
@@ -22,6 +23,10 @@ const formSchema = z.object({
     .refine((files) => files?.length === 1, "A document file is required.")
     .refine((files) => files?.[0]?.type === "application/pdf", "Only PDF files are allowed.")
     .refine((files) => files?.[0]?.size <= 10 * 1024 * 1024, "File size must be less than 10MB."),
+  reason: z
+    .string()
+    .min(10, "Please provide a reason with at least 10 characters.")
+    .max(500, "Reason must be less than 500 characters."),
 });
 
 function UploadPage() {
@@ -33,6 +38,7 @@ function UploadPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       documentFile: undefined,
+      reason: "",
     },
   });
 
@@ -62,7 +68,8 @@ function UploadPage() {
         status: 'Pending',
         url: fileUrl,
         fileSize: file.size,
-        fileType: file.type
+        fileType: file.type,
+        reason: values.reason
       };
 
       const documentId = await addDocumentToFirestore(documentData);
@@ -92,12 +99,30 @@ function UploadPage() {
         <CardHeader>
           <CardTitle>Upload Document</CardTitle>
           <CardDescription>
-            Select a PDF document from your computer to submit for approval. Maximum file size: 10MB.
+            Provide a reason for your upload and select a PDF document from your computer to submit for approval. Maximum file size: 10MB.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reason for Upload</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Please explain why you are uploading this document (e.g., compliance requirement, project documentation, etc.)"
+                        {...field}
+                        disabled={loading}
+                        rows={3}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="documentFile"

@@ -16,4 +16,5 @@ export type Document = {
   updatedAt?: Date;
   adminDecisionDate?: string; // ISO 8601 date string for when admin made the decision
   adminDecisionBy?: string; // Email of admin who made the decision
+  reason?: string; // Reason for document upload provided by user
 };
