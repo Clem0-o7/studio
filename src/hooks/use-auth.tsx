@@ -7,11 +7,11 @@ import { app } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_EMAIL = "tcedocs2025@gmail.com";
 
 // Username mapping for emails
 const EMAIL_TO_USERNAME: { [key: string]: string } = {
-  "admin@gmail.com": "Admin",
+  "tcedocs2025@gmail.com": "Admin",
   "tce@gmail.com": "TCE",
   "tca@gmail.com": "TCARTS",
   "newschool@gmail.com": "New School",
