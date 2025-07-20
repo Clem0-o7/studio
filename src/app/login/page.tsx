@@ -13,7 +13,7 @@ import { app } from '@/lib/firebase';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  var [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +25,10 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     try {
+      if (email == "admin@gmail.com")
+      {
+        email = "tcedocs2025@gmail.com"
+      }
       await signInWithEmailAndPassword(auth, email, password);
       toast({ title: 'Login Successful' });
       router.push('/admin');
