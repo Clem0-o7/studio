@@ -17,7 +17,7 @@ const EMAIL_TO_USERNAME: { [key: string]: string } = {
   "newschool@gmail.com": "New School",
   "aalampattitmills@gmail.com": "Aalampatti Mills",
   "virudhunagartmills@gmail.com":"Virudhunagar Mills",
-  "kappalurtmills@gmail.com":Kappalur Mills",
+  "kappalurtmills@gmail.com":"Kappalur Mills",
   "nilakottaitmills@gmail.com":"Nilakottai Mills",
   "tmill@gmail.com": "TMILLS"
 };
