@@ -15,10 +15,10 @@ const EMAIL_TO_USERNAME: { [key: string]: string } = {
   "tce@gmail.com": "TCE",
   "tca@gmail.com": "TCARTS",
   "newschool@gmail.com": "New School",
-  "alampattitmill@gmail.com": "Alampatti Mills",
-  "virudhunagartmill@gmail.com":"Virudhunagar Mills",
+  "aalampattitmills@gmail.com": "Aalampatti Mills",
+  "virudhunagartmills@gmail.com":"Virudhunagar Mills",
   "kappalurtmills@gmail.com":"Kappalur Mills",
-  "nilakottaitmill@gmail.com": "Nilakottai Mills",
+  "nilakottaitmills@gmail.com":"Nilakottai Mills",
   "tmill@gmail.com": "TMILLS"
 };
 
