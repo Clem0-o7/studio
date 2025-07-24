@@ -116,7 +116,7 @@ function AdminDashboardPage() {
 
   const clearFilters = () => {
     setUserFilter('all');
-    setStatusFilter('all');
+    setStatusFilter('Pending');
     setSearchQuery('');
   };
 
