@@ -52,7 +52,7 @@ function AdminDashboardPage() {
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [userFilter, setUserFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('Pending');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
@@ -116,7 +116,7 @@ function AdminDashboardPage() {
 
   const clearFilters = () => {
     setUserFilter('all');
-    setStatusFilter('Pending');
+    setStatusFilter('all');
     setSearchQuery('');
   };
 
